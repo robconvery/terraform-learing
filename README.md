@@ -1,6 +1,20 @@
 # terraform-learing
 Terraform learning
 
+##RDS database
+Setting the password locally
+```$xslt
+export TF_VAR_db_password="(YOUR_DB_PASSWORD)"
+```
+
+Sets the password to be used within `{directory-name}/data-stores/mysql/var.tf`
+
+```$xslt
+variable "db_password" {
+    description = "The password used by the database."    
+}
+```
+
 ## Remote storage
 
 terraform remote config `removed`. See https://www.terraform.io/docs/backends/types/s3.html 
