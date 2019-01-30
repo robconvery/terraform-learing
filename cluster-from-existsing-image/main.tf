@@ -7,11 +7,13 @@ variable "server_port" {
   default = 80
 }
 
+# has nginx preinstalled.
 variable "ami" {
   description = "ami of the resource."
   default = "ami-0e101c2ad1fbe6036"
 }
 
+# trying to phase out.
 variable "security_group_id" {
   description = "Existing security group to be used."
   default = "sg-05fdb3e471325ce6a"
@@ -23,19 +25,21 @@ resource "aws_launch_configuration" "example" {
 
   image_id = "${var.ami}"
   instance_type = "t2.micro"
-  security_groups = ["${var.security_group_id}"]
+  #security_groups = ["${var.security_group_id}"]
+  security_groups = ["${aws_security_group.instance.id}"]
 
   lifecycle {
     create_before_destroy = true
   }
-
+  
 }
 
 resource "aws_elb" "example" {
 
   name = "terraform-asg-example"
   availability_zones = ["${data.aws_availability_zones.all.names}"]
-  security_groups = ["${var.security_group_id}"]
+  #security_groups = ["${var.security_group_id}"]
+  security_groups = ["${aws_security_group.elb.id}"]
 
   listener {
     instance_port = "${var.server_port}"
@@ -71,7 +75,41 @@ resource "aws_autoscaling_group" "example" {
     propagate_at_launch = true
     value = "terraform-asg-example"
   }
+}
 
+resource "aws_security_group" "instance" {
+
+  name = "terraform-example-instance"
+
+  ingress {
+    from_port = "${var.server_port}"
+    to_port = "${var.server_port}"
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group" "elb" {
+
+  name = "terraform-example-elb"
+
+  ingress {
+    to_port = 80
+    from_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    to_port = 0
+    from_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 output "elb_dns_name" {
