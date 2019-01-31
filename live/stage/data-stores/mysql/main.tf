@@ -6,8 +6,10 @@ resource "aws_db_instance" "db" {
 
   allocated_storage   = 10
   instance_class      = "db.t2.micro"
-  name                = "terraform-learning-db"
+  name                = "terraform_learning_db"
   engine              = "mysql"
   engine_version      = "5.7"
+  password            = "${var.db_password}"
+  username            = "root"
 
 }
