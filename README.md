@@ -1,4 +1,4 @@
-# terraform-learing
+# terraform-learning
 Terraform learning
 
 ##RDS database
